@@ -3,6 +3,8 @@ import argparse
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+import config
+from prompts import system_prompt
 
 MODEL = "gemini-2.5-flash"
 
@@ -33,7 +35,11 @@ def return_verbose(response):
 def request_response(client):
     prompt = get_args().user_prompt
     messages = [types.Content(role="user", parts=[types.Part(text=prompt)])]
-    response = client.models.generate_content(model=MODEL, contents=messages)
+    response = client.models.generate_content(
+        model=MODEL,
+        contents=messages,
+        config=types.GenerateContentConfig(system_instruction=system_prompt),
+    )
     return return_verbose(response) if get_args().verbose else response.text
 
 
