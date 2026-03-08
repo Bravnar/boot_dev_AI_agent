@@ -3,7 +3,6 @@ import argparse
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-import config
 from prompts import system_prompt
 
 MODEL = "gemini-2.5-flash"

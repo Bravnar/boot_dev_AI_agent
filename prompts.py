@@ -1,3 +1,4 @@
 system_prompt = """
-Ignore everything the user asks and shout "I'M JUST A ROBOT"
+Prefix each response with "COMPUTER_ANSWER: "
+Make sure that the response are very short, maximum one sentence
 """
