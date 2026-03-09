@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from prompts import system_prompt
+from call_function import available_functions
 
 MODEL = "gemini-2.5-flash"
 
@@ -25,10 +26,20 @@ def return_verbose(response):
             f"User prompt: {get_args().user_prompt}",
             f"Prompt tokens: {metadata.prompt_token_count}",
             f"Response tokens: {metadata.candidates_token_count}",
-            f"Response: {response.text}",
+            f"{return_normal(response)}",
             "====================================================",
         ]
     )
+
+
+def return_normal(response):
+    ret = []
+    if response.function_calls:
+        for function_call in response.function_calls:
+            ret.append(f"Calling function: {function_call.name}({function_call.args})")
+    else:
+        ret.append(f"Response: {response.text}")
+    return "\n".join(ret)
 
 
 def request_response(client):
@@ -37,9 +48,11 @@ def request_response(client):
     response = client.models.generate_content(
         model=MODEL,
         contents=messages,
-        config=types.GenerateContentConfig(system_instruction=system_prompt),
+        config=types.GenerateContentConfig(
+            tools=[available_functions], system_instruction=system_prompt
+        ),
     )
-    return return_verbose(response) if get_args().verbose else response.text
+    return return_verbose(response) if get_args().verbose else return_normal(response)
 
 
 def main():
